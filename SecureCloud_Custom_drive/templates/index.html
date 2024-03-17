@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Cloud Custom Drive</title>
+</head>
+<body>
+   
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container">
+        <h1>Welcome, {{ session['username'] }}!</h1>
+        <p>This is your personalized dashboard.</p>
+
+        <!-- Upload button 
+        <a href="/upload" class="btn">Upload</a>
+
+        
+        <a href="/files" class="btn">Download</a>  -->
+    </div>
+    <div class="action_area">
+        <form id="actionForm" method="post">
+            <input type="hidden" name="selected_folder" />
+            <label for="folders">Select a folder:</label>
+            <select id="folders" name="folder">
+                <option value="Google">Google</option>
+                <option value="dropbox">Dropbox</option>
+                <!-- <option value="folder3">Folder 3</option> -->
+            </select>
+            <br><br>
+            <button type="submit" formaction="/upload">Upload</button>
+            <button type="submit" formaction="/download">Download</button>
+            <button type="submit" id="linkButton">Link</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('linkButton').addEventListener('click', function() {
+          const selectedFolder = document.getElementById('folders').value;
+          const actionForm = document.getElementById('actionForm');
+      
+          switch (selectedFolder) {
+            case 'Google':
+              actionForm.setAttribute('action', '/google_load');
+              break;
+            case 'dropbox':
+              actionForm.setAttribute('action', '/dropbox_load');
+              break;
+            case 'folder3':
+              actionForm.setAttribute('action', '/folder3_link');
+              break;
+          }
+        });
+      </script>
+</body>
+</html>
