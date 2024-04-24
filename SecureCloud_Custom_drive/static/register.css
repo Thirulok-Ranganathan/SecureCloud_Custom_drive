@@ -7,7 +7,7 @@ body {
   
   h2 {
     text-align: center;
-    color: #333;
+    color: #000000;
     margin-top: 30px;
   }
   
@@ -39,6 +39,16 @@ body {
     font-size: 16px;
     margin-left: 10px;
   }
+
+  .background-image {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    filter: brightness(60%);
+    }
 
   input[type="email"]{
     margin-left: 46px;

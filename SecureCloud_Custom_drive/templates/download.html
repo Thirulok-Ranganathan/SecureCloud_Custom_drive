@@ -10,7 +10,7 @@
             margin: 20px;
         }
         h1 {
-            color: #333;
+            color: #000000;
         }
         ul {
             list-style-type: none;
@@ -26,6 +26,13 @@
     </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li style="background-color: #333;"><a href="/home">Home</a></li>
+            <li style="background-color: #333;"><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <img src="/static/Images/vecteezy_cloud-computing-modern-flat-concept-for-web-banner-design_5868377.jpg" alt="Office Technology" class="background-image">
     <h1>Available Files</h1>
     <ul class="table-list">
         {% for file in files %}

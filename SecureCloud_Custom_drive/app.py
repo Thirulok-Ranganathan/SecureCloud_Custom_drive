@@ -23,6 +23,10 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'
 def index():
     return render_template('login.html')
 
+@app.route('/home')
+def home():
+    return render_template('index.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -209,7 +213,7 @@ def link_google():
 
         # Add credentials and folder ID to MongoDB
     mongo.db.users.update_one({'email': existing_data['email']}, {'$set': {'cred': cred_file, 'folder_id': folder_id}})
-    return 'Drive updated'
+    return render_template('index.html')
 
 @app.route('/dropbox_link', methods=['GET', 'POST'])
 def link_dropbox():
@@ -223,7 +227,7 @@ def link_dropbox():
 
         # Add credentials and folder ID to MongoDB
     mongo.db.users.update_one({'email': existing_data['email']}, {'$set': {'drop_access': access_token}})
-    return 'Drive updated'
+    return render_template('index.html')
 
 if __name__ == '__main__':
     bcrypt.init_app(app)
