@@ -187,7 +187,7 @@ def download_file(drive, file_name, file_id):
         except dropbox.exceptions.ApiError as e:
             return f'Error downloading file from Dropbox: {str(e)}', 500
     else:
-        abort(404, description='Invalid drive specified. Choose only "Google" drive.')
+        print("Invalid drive selected.")
 
 @app.route('/google_load', methods=['POST'])
 def load_google_link():

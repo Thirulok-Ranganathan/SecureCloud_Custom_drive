@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Download Files</title>
+    <link rel="stylesheet" type="text/css" href="/static/download.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,9 +27,9 @@
 </head>
 <body>
     <h1>Available Files</h1>
-    <ul>
+    <ul class="table-list">
         {% for file in files %}
-            <li>{{ file['name'] }} - <a href="/download/{{ drive }}/{{ file['name'] }}/{{ file['id'] }}">Download</a></li>
+            <li>{{ file['name'] }} <a href="/download/{{ drive }}/{{ file['name'] }}/{{ file['id'] }}">Download</a></li>
         {% endfor %}
     </ul>
 </body>
