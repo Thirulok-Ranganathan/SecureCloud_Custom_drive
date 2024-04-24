@@ -1,6 +1,6 @@
 from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Util.Padding import pad, unpad
 import rsa
 
@@ -9,13 +9,21 @@ password = 'Valueisworth'
 
 key = PBKDF2(password, salt, dkLen=32)
 
-with open("public_key.pem",'rb') as f:
+""" with open("public_key.pem",'rb') as f:
     public_key = rsa.PublicKey.load_pkcs1(f.read())
 
 with open("private_key.pem",'rb') as s:
-    private_key = rsa.PrivateKey.load_pkcs1(s.read())
+    private_key = rsa.PrivateKey.load_pkcs1(s.read()) """
 
-def encryption_process(message):
+def key_creation():
+    public_key, private_key = rsa.newkeys(2048)
+    private_ky = private_key.save_pkcs1().decode()
+    pub_ky = public_key.save_pkcs1().decode()
+    return (private_ky, pub_ky)
+
+def encryption_process(message, public_key_str):
+
+    public_key = rsa.PublicKey.load_pkcs1(public_key_str.encode())
     cipher = AES.new(key, AES.MODE_CBC) 
     padded_message = pad(message, AES.block_size)
     cipher_data = cipher.encrypt(padded_message)
@@ -38,7 +46,9 @@ def encryption_process(message):
     #return combined_encrypted
 
 
-def decryption_process(encrypted_data):
+def decryption_process(encrypted_data, private_key_str):
+    
+    private_key = rsa.PrivateKey.load_pkcs1(private_key_str.encode())
     decrypted_data = b''
 
     # Decrypt each chunk of the encrypted data
@@ -53,5 +63,4 @@ def decryption_process(encrypted_data):
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
     Original_data = unpad(cipher.decrypt(cipher_text), AES.block_size)
     return Original_data
-
 

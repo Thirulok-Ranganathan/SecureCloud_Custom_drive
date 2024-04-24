@@ -6,7 +6,8 @@ from validate_email import validate_email
 from werkzeug.utils import secure_filename
 from cloud_utils import google_drive_upload, Google_list_files, google_drive_download, dropbox_upload, dropbox_list
 import requests, io, json, dropbox
-from crypto_process import encryption_process, decryption_process
+from crypto_process import encryption_process, decryption_process, key_creation
+from stego_process import audio_encode, audio_decode
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -36,6 +37,10 @@ def register():
         if not validate_email(email):
             flash('Invalid email address', 'error')
             return render_template('register.html')
+        
+        private_key, public_key = key_creation()
+
+        audio_encode(private_key)
 
         # Save user data to MongoDB
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -43,7 +48,8 @@ def register():
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'password': hashed_password
+            'password': hashed_password,
+            'public_key': public_key
         }
         #insert and save data to mongodb
         users.insert_one(user_data)
@@ -97,21 +103,20 @@ def process_upload(drive):
         if uploaded_file.filename == '':
             return 'Invalid file type'
         usr_data = mongo.db.users.find_one({'email': email})
+        public_key = usr_data.get('public_key')
         if drive == 'Google':
             folderid = usr_data.get('folder_id','')
             cred = usr_data.get('cred',{})
             cred_dict = json.loads(cred)
             read_file = uploaded_file.read()
-            encrypt = encryption_process(read_file)
+            encrypt = encryption_process(read_file,public_key)
             
             msg = google_drive_upload(encrypt, uploaded_file.filename, folderid, cred_dict)
         elif drive == 'dropbox':
             read_file = uploaded_file.read()
-            encrypt = encryption_process(read_file)
+            encrypt = encryption_process(read_file, public_key)
             access_token = usr_data.get('drop_access','')
             msg = dropbox_upload(encrypt, uploaded_file.filename, access_token)
-        elif drive == 'folder3':
-            pass
         else:
             return 'Unknown Drive'
 
@@ -145,6 +150,7 @@ def show_files():
 def download_file(drive, file_name, file_id):
     email = session['user']
     usr_data = mongo.db.users.find_one({'email': email})
+    private_key = audio_decode()
     if drive == 'Google':
         
         folderid = usr_data.get('folder_id','')
@@ -159,7 +165,7 @@ def download_file(drive, file_name, file_id):
                fl.write(data)
             fl.close()"""
 
-            decrypted_data = decryption_process(data)
+            decrypted_data = decryption_process(data, private_key)
 
             decrypted_file_obj = io.BytesIO(decrypted_data)
             decrypted_file_obj.seek(0)
@@ -173,7 +179,7 @@ def download_file(drive, file_name, file_id):
 
             metadata, response = dbx.files_download('/' + file_name)
             print(response.content)
-            decrypted_data = decryption_process(response.content)
+            decrypted_data = decryption_process(response.content, private_key)
 
             decrypted_file_obj = io.BytesIO(decrypted_data)
             decrypted_file_obj.seek(0)
